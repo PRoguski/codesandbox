@@ -11,6 +11,7 @@
     <modules>
         <module>camel-activemq</module>
         <module>rest-easy-wiremock</module>
+        <module>spring-keycloak</module>
     </modules>
 
     <dependencies>
