@@ -37,8 +37,9 @@ class Rental {
         return total;
     }
 
-    public long calculatePoints() {
-        long points = 1;
+
+    public int calculatePoints() {
+        int points = 1;
         if ((_movie.getPriceCode() == Movie.NEW_RELEASE)
                 && _daysRented > 1) points++;
         return points;

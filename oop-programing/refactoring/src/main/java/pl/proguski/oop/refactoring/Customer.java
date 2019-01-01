@@ -1,18 +1,20 @@
 package pl.proguski.oop.refactoring;
 
-import java.util.Enumeration;
-import java.util.Vector;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 class Customer {
     private String _name;
-    private Vector _rentals = new Vector();
+    private List<Rental> _rentals = new ArrayList<>();
 
     public Customer(String name) {
         _name = name;
     }
 
     public void addRental(Rental arg) {
-        _rentals.addElement(arg);
+        _rentals.add(arg);
     }
 
     public String getName() {
@@ -22,28 +24,22 @@ class Customer {
     public String statement() {
         double totalAmount = 0;
         int frequentRenterPoints = 0;
-        Enumeration rentals = _rentals.elements();
-        String result = "Rental Record for " + getName() + "\n";
-        while (rentals.hasMoreElements()) {
-            Rental each = (Rental) rentals.nextElement();
-            //determine amounts for each line
-            double amount = each.calculateAmount();
+        StringBuilder sb = new StringBuilder("Rental Record for " + getName() + "\n");
 
-            // add frequent renter points
-            frequentRenterPoints += each.calculatePoints();
+        frequentRenterPoints = _rentals.stream().mapToInt(Rental::calculatePoints).sum();
+        totalAmount = _rentals.stream().mapToDouble(Rental::calculateAmount).sum();
 
-            //show figures for this rental
-            result += "\t" + each.getMovie().getTitle() + "\t" +
-                    String.valueOf(amount) + "\n";
-            totalAmount += amount;
-        }
+        //todo performance issue twice iteration over rental collection
+        sb.append(_rentals.stream().map(printAmountForOneMovie()).collect(Collectors.joining()));
+
         //add footer lines
-        result += "Amount owed is " + String.valueOf(totalAmount) +
-                "\n";
-        result += "You earned " + String.valueOf(frequentRenterPoints)
-                +
-                " frequent renter points";
-        return result;
+        sb.append("Amount owed is ").append(totalAmount).append("\n");
+        sb.append("You earned ").append(frequentRenterPoints).append(" frequent renter points");
+        return sb.toString();
+    }
+
+    private Function<Rental, String> printAmountForOneMovie() {
+        return rental -> "\t"+rental.getMovie().getTitle()+"\t"+rental.calculateAmount()+"\n";
     }
 
 }
