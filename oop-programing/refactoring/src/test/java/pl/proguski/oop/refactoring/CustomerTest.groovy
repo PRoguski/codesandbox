@@ -24,9 +24,47 @@ class CustomerTest extends Specification {
     }
 
     @Unroll
+    def 'rent one regular movie for #days day/s should cost #amount and return #freqPoints point/s'() {
+        expect:
+        customer.addRental(new Rental(new RegularMovie("Temp movie title"), days))
+        customer.statement() ==
+                "Rental Record for $NAME\n" +
+                "\tTemp movie title\t$amount\n" +
+                "Amount owed is $amount\n" +
+                "You earned $freqPoints frequent renter points"
+
+        where:
+        days || amount | freqPoints
+        1    || 2.0    | 1
+        2    || 2.0    | 1
+        3    || 3.5    | 1
+        5    || 6.5    | 1
+        10   || 14.0   | 1
+    }
+
+    @Unroll
+    def 'rent one NEW_RELEASE movie for #days day/s should cost #amount and return #freqPoints point/s'() {
+        expect:
+        customer.addRental(new Rental(new NewReleaseMovie("Temp movie title"), days))
+        customer.statement() ==
+                "Rental Record for $NAME\n" +
+                "\tTemp movie title\t$amount\n" +
+                "Amount owed is $amount\n" +
+                "You earned $freqPoints frequent renter points"
+
+        where:
+        days || amount | freqPoints
+        1    || 3.0    | 1
+        2    || 6.0    | 2
+        3    || 9.0    | 2
+        5    || 15.0   | 2
+        10   || 30.0   | 2
+    }
+
+    @Unroll
     def 'rent one movie(price code #price_code) for #days day/s should cost #amount and return #freqPoints point/s'() {
         expect:
-        customer.addRental(new Rental(new Movie("Temp movie title", price_code), days))
+        customer.addRental(new Rental(new RegularMovie("Temp movie title"), days))
         customer.statement() ==
                 "Rental Record for $NAME\n" +
                 "\tTemp movie title\t$amount\n" +
@@ -59,8 +97,8 @@ class CustomerTest extends Specification {
     def 'rent two movie (REGULAR and NEW_RELEASE) for #days day/s shoud cost #total_amount and return #freqPoints point/s'() {
         expect:
 
-        customer.addRental(new Rental(new Movie("Regular", 0), days))
-        customer.addRental(new Rental(new Movie("New release", 1), days))
+        customer.addRental(new Rental(new RegularMovie("Regular"), days))
+        customer.addRental(new Rental(new NewReleaseMovie("New release"), days))
 
         customer.statement() ==
                 "Rental Record for $NAME\n" +
